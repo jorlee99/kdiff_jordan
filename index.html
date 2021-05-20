@@ -101,6 +101,11 @@
 										<input type="range" min="0" max="100" value="1" class="slider" id="sliderRange">
 									  </div>
 								</form>
+								<p class="text-light" style="padding-top: 5px">
+									<small class="text-sm">
+									Slider for old vs. new
+									</small>
+								</p>
 							</div>
 						</div>
 					</div>
@@ -281,14 +286,10 @@
 												</defs>
 												<image id="diff-xlink-2-pcb" x="0" y="0" height="100%" width="100%" filter="url(#f2_pcb)" href="[INITIAL_COMMIT_2_PCB]"/>
 												<script>
-												
-													var slider = document.getElementById("sliderRange");
-													
-													slider.oninput = function() {
+				
+													document.getElementById("sliderRange").oninput = function() {
 													  document.getElementById("diff-xlink-1-pcb").style.x = this.value;
 													  document.getElementById("diff-xlink-2-pcb").style.x = -this.value;
-													  console.log(this.value);
-													  console.log(document.getElementById("diff-xlink-1-pcb").style.x);
 													}
 													
 													</script>
