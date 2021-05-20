@@ -42,8 +42,11 @@ pip3 install python_dateutil
 
 # Install Kicad-Diff
 git clone https://github.com/Gasman2014/KiCad-Diff.git
-```
 
+# Install modified kdiff
+git clone https://github.com/jorlee99/kdiff_jordan
+chmod -R 777 kdiff_jordan
+```
 ## Installing dependencies on OSX
 
 Install dependencies from "Installing dependencies on Linux" section and then
@@ -53,17 +56,14 @@ brew install gsed
 brew install findutils
 ```
 
-## Environment Setup (before using it)
+## Upon Ubuntu Start-up
 ```
 # Load KiCad-Diff environment
 cd KiCad-Diff
-source ./env.sh
-
-# Install kdiff environment
-git clone https://github.com/leoheck/kdiff
-cd kdiff
+source env.sh
 
 # Load kdiff environment
+cd kdiff
 source ./env.sh
 ```
 
@@ -101,6 +101,11 @@ EXAMPLES:
     # Nested Kicad projects
     kdiff nested-project/board.kicad_pcb -r -V
 ```
+
+## Changes compared to kdiff
+Scroll bar to see changes
+![image](https://user-images.githubusercontent.com/43526839/119060227-a2062500-b986-11eb-8626-1306463b734d.png)
+
 
 Credit goes to: @leoheck, @jnavila and @Gasman2014 for the underlying structure
 Special thanks to: @leoheck for building the basis for the support of kdiff
