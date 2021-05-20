@@ -723,3 +723,7 @@ function sliderChange() {
     document.getElementById("diff-xlink-1-pcb").style.x = document.getElementById("sliderRange").value;
     document.getElementById("diff-xlink-2-pcb").style.x = -document.getElementById("sliderRange").value;
   }
+
+function testClick(){
+    console.log("click worked");
+}
