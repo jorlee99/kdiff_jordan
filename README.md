@@ -1,35 +1,21 @@
 # Kicad Diff
 
-This repo is a test to have a more complete diff tool for Kicad.
-It uses [Kicad-Diff](https://github.com/Gasman2014/KiCad-Diff) to generate layout diffs and [Plotgitsh](https://github.com/jnavila/plotkicadsch) to generate schematic diffs.
+This repo is a copy of LeoHeck's kdiff tool with a a couple more quality of life features. It is also to be a platform to be primarily Windows tested and validated with support for both Linux and MacOS systems as well.
 
-It is currently supporting Kicad projects that use GIT.
+## How it works
 
-# Dependencies
+The kdiff command uses SVG's to compile differences using the [Kicad-Diff](https://github.com/Gasman2014/KiCad-Diff)  and  [Plotgitsh](https://github.com/jnavila/plotkicadsch) commands. 
 
-
-## [Installing dependencies on Windows](https://www.tenforums.com/tutorials/46769-enable-disable-windows-subsystem-linux-wsl-windows-10-a.html)
+## Installation for Windows
 
 Configure WSL
+(https://www.tenforums.com/tutorials/46769-enable-disable-windows-subsystem-linux-wsl-windows-10-a.html)
 
-```batch
-:: Enalbe Windows Sybsystem for Linux (using Power Shell)
-dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-#Install-WindowsFeature -Name Microsoft-Windows-Subsystem-Linux
+Install Ubuntu either through [webstore](https://www.microsoft.com/en-ca/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab)) or any other option (working on Ubuntu 20.04)
 
-:: Install Ubuntu 20.04
-Invoke-WebRequest -Uri https://aka.ms/wsl-ubuntu-2004 -OutFile ~/Downloads/ubuntu-2004.zip
-New-Item -Path C:\ubuntu-2004 -ItemType Directory
-Expand-Archive -Path ~/Downloads/ubuntu-2004.zip C:\ubuntu-2004
-Set-Location C:\ubuntu-2004
-& .\ubuntu1804.exe
-```
+Continue to Linux installation
 
-And then continue with the instructions in "Installing dependencies on Linux" inside the WSL (Ubuntu terminal).
-
-
-## Installing dependencies on Linux
+## Installing on Linux
 
 ```
 # Basic dependencies
@@ -38,10 +24,9 @@ sudo apt install -y pkg-config
 sudo apt install -y opam
 sudo apt install -y python3-pip
 sudo apt install -y python3-tk
-sudo apt install -y kicad
 
 # Initialize opam
-opam init --disable-sandboxing --reinit
+opam init --disable-sandboxing
 opam switch create 4.09.1
 opam switch 4.09.1
 eval $(opam env)
@@ -117,20 +102,5 @@ EXAMPLES:
     kdiff nested-project/board.kicad_pcb -r -V
 ```
 
-## Examples
-
-Schematic view, assets generated using Plotkicadsch
-
-<p align="center">
-	<img src="misc/sch.png" width="820" alt="sch">
-</p>
-
-Layout view, assets generated using Kicad-Diff
-
-<p align="center">
-	<img src="misc/pcb.png" width="820" alt="pcb">
-</p>
-
-Demo on Youtube
-
-[![Demo](http://img.youtube.com/vi/PMC0USSsbDE/0.jpg)](http://www.youtube.com/watch?v=PMC0USSsbDE "")
+Credit goes to: @leoheck, @jnavila and @Gasman2014 for the underlying structure
+Special thanks to: @leoheck for building the basis for the support of kdiff
