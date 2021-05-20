@@ -96,6 +96,11 @@
 										</button>
 									</div>
 								</form>
+								<form class ="inline">
+									<div class="slidecontainer">
+										<input type="range" min="1" max="100" value="1" class="slider" id="sliderRange">
+									  </div>
+								</form>
 							</div>
 						</div>
 					</div>
@@ -184,7 +189,7 @@
 													Eco1_User
 												</a>
 												<a class="dropdown-item" href="#" id="Eco2_User" name="layers_new" value="Eco2_User"/>
-													<span style="margin-left:0px; margin-right:0.1em; color: " class="iconify" data-icon="teenyicons-square-solid" data-inline="false"></span>
+													<span style="margin-left:0px; margin-right:0.1em; color: gray" class="iconify" data-icon="teenyicons-square-solid" data-inline="false"></span>
 													Eco2_User
 												</a>
 												<a class="dropdown-item" href="#" id="Edge_Cuts" name="layers_new" value="Edge_Cuts"/>
@@ -244,6 +249,7 @@
 												</defs>
 												<image id="diff-xlink-2-sch" x="0" y="0" height="100%" width="100%" filter="url(#f2_sch)" href="[INITIAL_COMMIT_2_SCH]"/>
 											</svg>
+											
 										</g>
 									</svg>
 								</div>
@@ -263,6 +269,17 @@
 												</defs>
 												<image id="diff-xlink-1-pcb" x="0" y="0" height="100%" width="100%" filter="url(#f1_pcb)" href="[INITIAL_COMMIT_1_PCB]"/>
 											</svg>
+											<script>
+												
+												var slider = document.getElementById("sliderRange");
+												
+												slider.oninput = function() {
+												  document.getElementById("diff-xlink-1-pcb").style.x = this.value;
+												  console.log(this.value);
+												  console.log(document.getElementById("diff-xlink-1-pcb").style.x);
+												}
+												
+												</script>
 											<svg id="img-2-pcb-pcb">
 												<defs>
 												<filter id="f2_pcb">

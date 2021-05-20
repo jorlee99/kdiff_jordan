@@ -711,3 +711,11 @@ function show_slide() {
 
 // =======================================
 // =======================================
+
+function layerComparison(){
+    if (document.getElementById('diff-pcb').style.display === "inline") {
+        oldLayer = document.getElementById("diff-xlink-1-pcb").href.baseVal;
+        newLayer = document.getElementById("diff-xlink-2-pcb").href.baseVal;
+    }
+}
+
