@@ -719,7 +719,7 @@ function layerComparison(){
     }
 }
 
-document.getElementById("sliderRange").oninput = function() {
-    document.getElementById("diff-xlink-1-pcb").style.x = this.value;
-    document.getElementById("diff-xlink-2-pcb").style.x = -this.value;
+function sliderChange() {
+    document.getElementById("diff-xlink-1-pcb").style.x = document.getElementById("sliderRange").value;
+    document.getElementById("diff-xlink-2-pcb").style.x = -document.getElementById("sliderRange").value;
   }
