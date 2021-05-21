@@ -334,8 +334,8 @@ insert_layers()
 		fi
 
 		IFS= read -r -d '' LAYER_HTML <<-EOM
-		    <input type="radio" id="${layer}" name="layers" value="${layer}" ${checked} onclick="testClick()" onchange="change_layer()"/>
-		    <label class="rounded text-sm-left list-group-item radio-box" for="${layer}">
+		    <input type="radio" id="${layer}" name="layers" value="${layer}" ${checked}  onchange="change_layer()"/>
+		    <label class="rounded text-sm-left list-group-item radio-box" onclick="testClick()" for="${layer}">
 		        <span style="margin-left:0.5em; margin-right:0.1em; color: ${layer_color}" class="iconify" data-icon="teenyicons-square-solid" data-inline="false"></span>
 		        ${layer}
 		    </label>
