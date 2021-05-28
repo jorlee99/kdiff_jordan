@@ -720,10 +720,14 @@ function layerComparison(){
 }
 
 function sliderChange() {
-    document.getElementById("diff-xlink-1-pcb").style.x = document.getElementById("sliderRange").value;
-    document.getElementById("diff-xlink-2-pcb").style.x = -document.getElementById("sliderRange").value;
+    document.getElementById("diff-xlink-1-pcb").style.x = parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
+    document.getElementById("diff-xlink-2-pcb").style.x = -parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
   }
 
-function testClick(){
-    console.log("click worked");
+function schematicChangeOnClick(){
+    console.log("schematic page change worked");
+
+}
+function layerChangeOnClick(){
+    console.log("layer change worked");
 }
