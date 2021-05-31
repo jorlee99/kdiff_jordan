@@ -24,7 +24,7 @@ show_help()
 	    # Kicad project on the root of the repo
 	    kdiff board.pro
 
-	    # Nested Kicad projects 
+	    # Nested Kicad projects
 	    kdiff nested-project/board.pro -r -V
 	EOM
 
@@ -137,8 +137,8 @@ get_pages()
 	# First page is this one
 	pages="${board_name}|${board_name}"
 
-	pagenames=$(grep "^F0 " "${main_schematic}" | cut -d" " -f2 | tr "\n" "|" | sed_ "s/\"//g" | sed_ "s/|$//g" | tr "|" "\n")
-	pagepaths=$(grep "^F1 " "${main_schematic}" | cut -d" " -f2 | tr "\n" "|" | sed_ "s/\"//g" | sed_ "s/|$//g" | tr "|" "\n")
+	pagenames=$(sed_ "s/\r$//g" "${main_schematic}" | grep "^F0 " | cut -d" " -f2 | tr "\n" "|" | sed_ "s/\"//g" | sed_ "s/|$//g" | tr "|" "\n")
+	pagepaths=$(sed_ "s/\r$//g" "${main_schematic}" | grep "^F1 " | cut -d" " -f2 | tr "\n" "|" | sed_ "s/\"//g" | sed_ "s/|$//g" | tr "|" "\n")
 
 	IFS=$'\n'
 	n=0
@@ -258,16 +258,16 @@ insert_pages()
 	for page in $pages; do
 
 		page_name=$(echo "$page" | cut -d'|' -f1 | sed_ "s/[ \t]\+//g")
-		page_filename=$(  echo "$page" | cut -d'|' -f2 | sed_ "s/[ \t]\+//g" | sed_ "s/.sch//g")
+		page_filename=$(echo "$page" | cut -d'|' -f2 | sed_ "s/[ \t]\+//g" | sed_ "s/.sch//g")
 
 		if [[ $n == 0 ]]; then
-			checked="checked='checked'"
+			checked='checked="checked"'
 		else
 			checked=""
 		fi
 
-		IFS= read -r -d '' PAGE_HTML <<-EOM
-		    <input type="radio" id="${page_filename}" value="${page_filename}" name="pages" ${checked} onclick="schematicChangeOnClick()" onchange="change_page()"/>
+		IFS= read -r -d '' HTML_SNIPPET <<-EOM
+		    <input type="radio" id="${page_filename}" value="${page_filename}" name="pages" ${checked} onchange="change_page()"/>
 		    <label class="rounded text-sm-left list-group-item radio-box" for="${page_filename}">
 		    <span style="margin-left:0.5em; margin-right:0.1em;" class="iconify" data-icon="gridicons:pages" data-inline="false"></span>
 		    ${page_name}
@@ -276,13 +276,14 @@ insert_pages()
 
 		n=$((n+1))
 
-		PAGES_LIST_HTML="${PAGES_LIST_HTML}${PAGE_HTML}"
+		PAGES_LIST_HTML="${PAGES_LIST_HTML}${HTML_SNIPPET}"
 
 	done
 
-	contents=$(<"${html}")
-	new_contents=${contents//"<!-- FILL_PAGES_HERE -->"/${PAGES_LIST_HTML}}
-	printf '%s' "${new_contents}" > "${html}"
+	echo "    - Updating html"
+	HTML_CONTENT=$(<"${html}")
+	HTML_CONTENT_UPDATED=${HTML_CONTENT//"<!-- FILL_PAGES_HERE -->"/${PAGES_LIST_HTML}}
+	printf '%s' "${HTML_CONTENT_UPDATED}" > "${html}"
 }
 
 insert_layers()
@@ -333,9 +334,9 @@ insert_layers()
 			checked=""
 		fi
 
-		IFS= read -r -d '' LAYER_HTML <<-EOM
+		IFS= read -r -d '' HTML_SNIPPET <<-EOM
 		    <input type="radio" id="${layer}" name="layers" value="${layer}" ${checked}  onchange="change_layer()"/>
-		    <label class="rounded text-sm-left list-group-item radio-box" onclick="layerChangeOnClick()" for="${layer}">
+		    <label class="rounded text-sm-left list-group-item radio-box" for="${layer}">
 		        <span style="margin-left:0.5em; margin-right:0.1em; color: ${layer_color}" class="iconify" data-icon="teenyicons-square-solid" data-inline="false"></span>
 		        ${layer}
 		    </label>
@@ -343,13 +344,14 @@ insert_layers()
 
 		n=$((n+1))
 
-		LAYERS_LIST_HTML="${LAYERS_LIST_HTML}${LAYER_HTML}"
+		LAYERS_LIST_HTML="${LAYERS_LIST_HTML}${HTML_SNIPPET}"
 
 	done
 
-	contents=$(<"${html}")
-	new_contents=${contents//"<!-- FILL_LAYERS_HERE -->"/${LAYERS_LIST_HTML}}
-	printf '%s' "${new_contents}" > "${html}"
+	echo "    - Updating html"
+	HTML_CONTENT=$(<"${html}")
+	HTML_CONTENT_UPDATED=${HTML_CONTENT//"<!-- FILL_LAYERS_HERE -->"/${LAYERS_LIST_HTML}}
+	printf '%s' "${HTML_CONTENT_UPDATED}" > "${html}"
 }
 
 generate_comparisons()
@@ -358,6 +360,12 @@ generate_comparisons()
 	repo_root_path=$2
 	project_path=$3
 	kicad_pcb=$4
+
+	# Workaround for windows line endings
+	if [[ ! -f "${kicad_pcb}.bkp" ]]; then
+		cp "${kicad_pcb}" "${kicad_pcb}.bkp" 2> /dev/null
+	fi
+	dos2unix "${kicad_pcb}"
 
 	main_html=index.html
 
@@ -380,8 +388,14 @@ generate_comparisons()
 		fi
 	fi
 
-	if [[ "$project_path" == $(basename "$(pwd)") ]]; then
-		current_path_fix="./"
+	current_path=$(realpath --relative-to="$repo_root_path" .)
+
+	if [[ "$current_path" == "$project_path" ]]; then
+		if [[ "$project_path" != "." ]]; then
+			current_path_fix="./"
+		else
+			current_path_fix="${project_path}"
+		fi
 	else
 		current_path_fix="${project_path}"
 	fi
@@ -468,6 +482,10 @@ generate_comparisons()
 	sch_page_names=$(get_pages "${board_name}" "${current_path_fix}/${board_name}.sch" | cut -d"|" -f2)
 	board_layers=$(sed_ -n '/^  (layers/,/  )$/{/^  (layers/!{/  )$/!p}}' "${kicad_pcb}" | sed_ "s/^[ \t]\+//g" | sed_ "s/[()]//g" | cut -d" " -f2 | tr "." "_")
 
+	# Remove windows line endings
+	sch_page_names=$(echo "$sch_page_names" | sed_ "s/\r$//g")
+	board_layers=$(echo "$board_layers" | sed_ "s/\r$//g")
+
 	if [[ "${VERBOSE}" == "1" ]]; then
 		echo "Schematic Pages"
 		echo "${sch_page_names}" | nl
@@ -511,9 +529,17 @@ generate_comparisons()
 
 				# ====
 
+				if [[ "$DEBUG" == 0 ]]; then
+					HASHTAG=""
+				else
+					HASHTAG="#"
+				fi
+
+				# ====
+
 				if [[ ! "${KIDIFF_MISSING}" == 1 ]]; then
 
-					cmd="kidiff ${kicad_pcb} --webserver-disable -a $i -b $j &> /dev/null"
+					cmd="kidiff ${kicad_pcb} --webserver-disable -a $i -b $j ${HASHTAG} &> /dev/null"
 					if [[ "$VERBOSE" == "1" ]]; then
 						echo "   $cmd"
 					fi
@@ -534,12 +560,12 @@ generate_comparisons()
 
 					if [[ "$ret" == "1" ]]; then
 						if [[ ! $(du -s "${output_dir}/$i/${board_name}.kicad_pcb" | cut -d$'\t' -f1) = 0 ]]; then
-							cmd="plotpcb -o \"${output_dir}/$i/\" -q \"${output_dir}/$i/${board_name}.kicad_pcb\""
+							cmd="plotpcb -o \"${output_dir}/$i/\" -q \"${output_dir}/$i/${board_name}.kicad_pcb\" ${HASHTAG} &> /dev/null"
 							echo "   ${cmd}"
 							eval "$cmd"
 						fi
 						if [[ ! $(du -s "${output_dir}/$j/${board_name}.kicad_pcb" | cut -d$'\t' -f1) = 0 ]]; then
-							cmd="plotpcb -o \"${output_dir}/$j/\" -q \"${output_dir}/$j/${board_name}.kicad_pcb\""
+							cmd="plotpcb -o \"${output_dir}/$j/\" -q \"${output_dir}/$j/${board_name}.kicad_pcb\" ${HASHTAG} &> /dev/null"
 							echo "   ${cmd}"
 							eval "$cmd"
 						fi
@@ -565,7 +591,22 @@ generate_comparisons()
 				background_color="222222"
 
 				if [[ ! "$PLOTGITSCH_MISSING" == 1 ]]; then
-					cmd="plotgitsch-dir -d ${current_path_fix} -l ${current_path_fix}/${board_name}-cache.lib -c ${removed_color}:${added_color}:${unchanged_color}:${background_color} ${i} ${j} &> /dev/null"
+
+					if [[ "$project_path" == "." ]] || [[ "$project_path" == "./" ]]; then
+						plotgitsch_path=""
+						lib_path="."
+					else
+						if [[ "$current_path" != "$project_path" ]]; then
+							pushd "${project_path}" &> /dev/null || exit
+							plotgitsch_path="-r ${project_path}"
+							lib_path="."
+						else
+							plotgitsch_path="-r ${project_path}"
+							lib_path="."
+						fi
+					fi
+
+					cmd="plotgitsch ${plotgitsch_path} -m -l ${lib_path}/${board_name}-cache.lib -c ${removed_color}:${added_color}:${unchanged_color}:${background_color} ${i} ${j} ${HASHTAG} &> /dev/null"
 					if [[ "${VERBOSE}" == "1" ]]; then
 						echo "   $cmd"
 					fi
@@ -581,6 +622,11 @@ generate_comparisons()
 					fi
 					if [[ "${VERBOSE}" == "1" ]]; then
 						echo
+					fi
+
+					if [[ "$current_path" != "$project_path" ]]; then
+						popd &> /dev/null || exit
+						mv "${project_path}"/*.svg .
 					fi
 				fi
 
@@ -635,6 +681,8 @@ generate_comparisons()
 		# done
 	done
 
+	echo "    Assembling HTML"
+
 	# Copy assets
 	cp -f "${script_path}/${main_html}" "${web_dir}/"
 	cp -f "${script_path}/kdiff.js"     "${web_dir}/"
@@ -644,13 +692,16 @@ generate_comparisons()
 	cp -f "${script_path}/redirect.html" "${web_dir}/../index.html"
 
 	# Insert commits list
+	echo "    Insert commits list"
 	insert_commits "${web_dir}/${main_html}" "${commits}" "${current_path_fix}" "${kicad_pcb}" "${sch_files}"
 
 	# Insert pages list
+	echo "    Insert pages list"
 	pages=$(get_pages "${board_name}" "${current_path_fix}/${board_name}.sch")
 	insert_pages "${web_dir}/${main_html}" "$pages"
 
 	# Update board title
+	echo "    Update board title"
 	title=$(grep -i "(title .*)" "${kicad_pcb}" 2> /dev/null | sed_ "s/^[ \t]\+//g" | cut -d" " -f 2- | sed_ "s/[)\"]//g")
 	if [[ $title == "" ]]; then
 		title="{Title}";
@@ -658,6 +709,7 @@ generate_comparisons()
 	sed_ -i "s|\[PROJECT_TITLE\]|${title}|g" "${web_dir}/${main_html}"
 
 	# Update board revision
+	echo "    Update board revision"
 	revision=$(grep "(rev " "${kicad_pcb}" 2> /dev/null | sed_ "s/^[ \t]\+//g" | sed_ "s/[()]//g" | cut -d" " -f2- | sed_ "s/\"//g")
 	if [[ $revision == "" ]]; then
 		revision="{Rev}";
@@ -665,6 +717,7 @@ generate_comparisons()
 	sed_ -i "s|\[PROJECT_REVISION\]|${revision}|g" "${web_dir}/${main_html}"
 
 	# Update board date
+	echo "    Update board date"
 	date=$(grep "(date " "${kicad_pcb}" 2> /dev/null | sed_ "s/^[ \t]\+//g" | sed_ "s/[()]//g" | cut -d" " -f2)
 	if [[ $date == "" ]]; then
 		date="{Date}";
@@ -672,27 +725,37 @@ generate_comparisons()
 	sed_ -i "s|\[PROJECT_DATE\]|${date}|g" "${web_dir}/${main_html}"
 
 	# Update board name
+	echo "    Update board name"
 	sed_ -i "s|var board_name =.*|var board_name = \"${board_name}\"; // generated by kdiff script |g" "${web_dir}/kdiff.js"
 
 	commit1=$(echo "$commits" | head -n1 | tail -n1 | cut -d" " -f1)
 	commit2=$(echo "$commits" | head -n2 | tail -n1 | cut -d" " -f1)
 
 	# Update initial schematic images
+	echo "    Update initial schematic images"
 	sed_ -i "s|\[INITIAL_COMMIT_1_SCH\]|../${commit1}/sch-${board_name}.svg|g" "${web_dir}/${main_html}"
 	sed_ -i "s|\[INITIAL_COMMIT_2_SCH\]|../${commit2}/sch-${board_name}.svg|g" "${web_dir}/${main_html}"
 
 	# Update initial layout images
+	echo "    Update initial layout images"
 	initial_layer=$(echo "$board_layers" | head -1)
 	sed_ -i "s|\[INITIAL_COMMIT_1_PCB\]|../${commit1}/${board_name}-${initial_layer}.svg|g" "${web_dir}/${main_html}"
 	sed_ -i "s|\[INITIAL_COMMIT_2_PCB\]|../${commit2}/${board_name}-${initial_layer}.svg|g" "${web_dir}/${main_html}"
 
 	# Update initial commit legend
+	echo "    Update initial commit legend"
 	sed_ -i "s|\[COMMIT_1_HASH\]|${commit1}|g" "${web_dir}/${main_html}"
 	sed_ -i "s|\[COMMIT_2_HASH\]|${commit2}|g" "${web_dir}/${main_html}"
 
 	# Insert layers list
+	echo "    Insert layers list"
 	board_layers=$(sed_ -n '/^  (layers/,/  )$/{/^  (layers/!{/  )$/!p}}' "${kicad_pcb}" | sed_ "s/^[ \t]\+//g" | sed_ "s/[()]//g" | cut -d" " -f2)
 	insert_layers "${web_dir}/${main_html}" "$board_layers"
+
+	# Restore board
+	if [[ -f "${kicad_pcb}.bkp" ]]; then
+		mv -f "${kicad_pcb}.bkp" "${kicad_pcb}" &> /dev/null
+	fi
 }
 
 
@@ -706,12 +769,13 @@ script_dir=$(dirname "$script_path")
 trap ctrl_c INT
 
 export ALL_COMMITS=0
-export REMOVE_KDIFF_FOLDER=0
-export VERBOSE=0
+export DEBUG=0
 export DRY_RUN=0
+export LAUNCH_PAGE=1
 export NEWER_COMMIT=""
 export OLDER_COMMIT=""
-export LAUNCH_PAGE=1
+export REMOVE_KDIFF_FOLDER=0
+export VERBOSE=0
 export WEBSERVER_PORT=8000
 
 while [[ $# -gt 0 ]]
@@ -768,6 +832,11 @@ do
 		shift
 		;;
 
+	-D)
+		DEBUG=1
+		shift
+		;;
+
 	*)
 		kicad_pro="$1"
 		shift # past argument
@@ -795,10 +864,12 @@ if [[ ! "${KIDIFF_MISSING}" = 0 ]]; then
 	echo "INFO: kidiff is missing, layout diff won't be generated"
 fi
 
+if ! check_tool "dos2unix" &> /dev/null; then "dos2unix is missing"; exit; fi
+
 case $OSTYPE in
 	darwin*)
-		if check_tool gsed > /dev/null; then exit; fi
-		if check_tool gfind > /dev/null; then exit; fi
+		if ! check_tool "gsed" &> /dev/null; then "gsed is missing"; exit; fi
+		if ! check_tool "gfind" &> /dev/null; then "gfind is missing"; exit; fi
 		;;
 esac
 
@@ -816,15 +887,19 @@ fi
 output_dir="${repo_root}/kidiff/${project_dir}"
 web_dir="${output_dir}/web/"
 
-if grep -q "Microsoft" /proc/version > /dev/null; then
-	# Webserver alternative for Windows with WSL
-	host=127.0.0.1
-	echo "Starting webserver at http://${host}:${WEBSERVER_PORT}"
-	cmd.exe /C start "http://${host}:${WEBSERVER_PORT}" &> /dev/null &
-	python3 -m http.server -d "${web_dir}/../" -b "$host" "$WEBSERVER_PORT" &> /dev/null
-	echo "(Hit Ctrl+C to exit)"
-else
-	webserver.py -p "$WEBSERVER_PORT" "${kicad_pcb}"
-	pid=$?
-	kill -9 $pid > /dev/null
+echo
+
+if [[ ! "${LAUNCH_PAGE}" == 0 ]]; then
+	if grep -q "Microsoft" "/proc/version" &> /dev/null; then
+		# Webserver alternative for Windows with WSL
+		host=127.0.0.1
+		echo "Starting webserver at http://${host}:${WEBSERVER_PORT}"
+		cmd.exe /C start "http://${host}:${WEBSERVER_PORT}" &> /dev/null &
+		python3 -m http.server -d "${web_dir}/../" -b "$host" "$WEBSERVER_PORT" &> /dev/null
+		echo "(Hit Ctrl+C to exit)"
+	else
+		webserver.py -p "$WEBSERVER_PORT" "${kicad_pcb}"
+		pid=$?
+		kill -9 $pid > /dev/null
+	fi
 fi
