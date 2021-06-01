@@ -346,6 +346,7 @@ window.onkeydown = function(e) {
             }
 
             pages[new_index].checked = true;
+            console.log(new_index);
 
             change_page();
         } else {
@@ -358,6 +359,7 @@ window.onkeydown = function(e) {
             }
 
             layers[new_index].checked = true;
+            console.log(new_index);
 
             change_layer();
         }
@@ -378,6 +380,7 @@ window.onkeydown = function(e) {
             }
 
             pages[new_index].checked = true;
+            console.log(new_index);
 
             change_page();
         } else {
@@ -390,6 +393,7 @@ window.onkeydown = function(e) {
             }
 
             layers[new_index].checked = true;
+            console.log(new_index);
 
             change_layer();
         }
@@ -725,36 +729,14 @@ function sliderChange() {
   }
 
 function schematicChangeOnClick(){
-    console.log("schematic page change worked");
+    var layers = $("#layers_list input:radio[name='layers']");
     
 
 }
-function layerChangeOnClick(){
-    var layers = $("#layers_list input:radio[name='layers']");
-    var selected_layer = layers.index(layers.filter(':checked'));
-    var layer_name = layers[selected_layer].value;
 
-    console.log("selected_layer:", layer_name);
-
-    var current_href1 = document.getElementById("diff-xlink-1-pcb").href.baseVal;
-    var current_href2 = document.getElementById("diff-xlink-2-pcb").href.baseVal;
-
-    var commit1 = current_href1.split("/")[1];
-    var commit2 = current_href2.split("/")[1];
-
-    var board_name = "board";
-
-    var image_path_1 = "../" + commit1 + "/" + board_name + "-" + layer_name + ".svg" + img_timestamp();
-    var image_path_2 = "../" + commit2 + "/" + board_name + "-" + layer_name + ".svg" + img_timestamp();
-
-    document.getElementById("diff-xlink-1-pcb").href.baseVal = image_path_1;
-    document.getElementById("diff-xlink-2-pcb").href.baseVal = image_path_2;
-
-    console.log("image_path_1:", image_path_1);
-    console.log("image_path_2:", image_path_2);
-    console.log("layer change worked layer selected " + layer_name);
-
-    // Refreshing view somehow. How this works?
-    update_commits(); 
-
+function layerChangeOnClick(sourceObject){  
+    console.log(sourceObject);
+    layers = $("#layers_list input:radio[name='layers']");
+    layers[layers.index(layers.filter(sourceObject))].checked = true;
+    
 }
