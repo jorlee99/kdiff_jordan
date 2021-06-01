@@ -738,5 +738,6 @@ function layerChangeOnClick(sourceObject){
     console.log(sourceObject);
     layers = $("#layers_list input:radio[name='layers']");
     layers[layers.index(layers.filter(sourceObject))].checked = true;
+    change_layer();
     
 }
