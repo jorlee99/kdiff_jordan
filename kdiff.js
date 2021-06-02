@@ -414,6 +414,7 @@ window.onkeydown = function(e) {
         if (document.getElementById('diff-pcb').style.display === "inline") {
             panZoom_pcb.resetZoom();
             panZoom_pcb.center();
+            document.getElementById("sliderRange").value = 0
             // panZoom_pcb.fit() // cannot be used, bug?
         }
 
@@ -626,6 +627,7 @@ window.onload = function() {
         if (document.getElementById('diff-pcb').style.display === "inline") {
             panZoom_pcb.resetZoom();
             panZoom_pcb.center();
+            document.getElementById("sliderRange").value = 0
             // panZoom_pcb.fit(); // cannot be used, bug?
         }
     });
@@ -743,9 +745,6 @@ function schematicChangeOnClick(sourceObject){
     pages = $("#pages_list input:radio[name='pages']");
     pages[pages.index(pages.filter(sourceObject))].checked = true;
     change_page()
-    
-    
-
 }
 
 function layerChangeOnClick(sourceObject){  
