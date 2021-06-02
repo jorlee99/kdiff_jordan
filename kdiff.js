@@ -414,7 +414,8 @@ window.onkeydown = function(e) {
         if (document.getElementById('diff-pcb').style.display === "inline") {
             panZoom_pcb.resetZoom();
             panZoom_pcb.center();
-            document.getElementById("sliderRange").value = 0
+            document.getElementById("sliderRange").value = 0;
+            sliderChange();
             // panZoom_pcb.fit() // cannot be used, bug?
         }
 
@@ -627,7 +628,8 @@ window.onload = function() {
         if (document.getElementById('diff-pcb').style.display === "inline") {
             panZoom_pcb.resetZoom();
             panZoom_pcb.center();
-            document.getElementById("sliderRange").value = 0
+            document.getElementById("sliderRange").value = 0;
+            sliderChange();
             // panZoom_pcb.fit(); // cannot be used, bug?
         }
     });
