@@ -724,8 +724,17 @@ function layerComparison(){
 }
 
 function sliderChange() {
-    document.getElementById("diff-xlink-1-pcb").style.opacity = (100-parseFloat(document.getElementById("sliderRange").value).toFixed(2))+"%";
-    document.getElementById("diff-xlink-2-pcb").style.opacity = (100+parseFloat(document.getElementById("sliderRange").value).toFixed(2))+"%";
+    if (document.getElementById("sliderRange").value >= 0)
+    {
+        document.getElementById("diff-xlink-1-pcb").style.opacity = (100-parseFloat(document.getElementById("sliderRange").value).toFixed(2))+"%";
+        document.getElementById("diff-xlink-2-pcb").style.opacity = "100%";
+    }
+    if (document.getElementById("sliderRange").value < 0)
+    {
+        document.getElementById("diff-xlink-2-pcb").style.opacity = (100-parseFloat(document.getElementById("sliderRange").value).toFixed(2))+"%";
+        document.getElementById("diff-xlink-1-pcb").style.opacity = "100%";
+    }
+    
     console.log(parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%");
   }
 
