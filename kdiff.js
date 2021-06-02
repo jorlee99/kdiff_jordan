@@ -728,14 +728,6 @@ function sliderChange() {
     document.getElementById("diff-xlink-2-pcb").style.x = -parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
   }
 
-<<<<<<< HEAD
-function schematicChangeOnClick(){
-    console.log("schematic page change worked");
-
-}
-function layerChangeOnClick(){
-    console.log("layer change worked");
-=======
 function schematicChangeOnClick(sourceObject){
     console.log(sourceObject);
     pages = $("#pages_list input:radio[name='pages']");
@@ -752,5 +744,4 @@ function layerChangeOnClick(sourceObject){
     layers[layers.index(layers.filter(sourceObject))].checked = true;
     change_layer();
     
->>>>>>> Layer_Change
 }
