@@ -346,6 +346,7 @@ window.onkeydown = function(e) {
             }
 
             pages[new_index].checked = true;
+            console.log(new_index);
 
             change_page();
         } else {
@@ -358,6 +359,7 @@ window.onkeydown = function(e) {
             }
 
             layers[new_index].checked = true;
+            console.log(new_index);
 
             change_layer();
         }
@@ -378,6 +380,7 @@ window.onkeydown = function(e) {
             }
 
             pages[new_index].checked = true;
+            console.log(new_index);
 
             change_page();
         } else {
@@ -390,6 +393,7 @@ window.onkeydown = function(e) {
             }
 
             layers[new_index].checked = true;
+            console.log(new_index);
 
             change_layer();
         }
@@ -724,10 +728,29 @@ function sliderChange() {
     document.getElementById("diff-xlink-2-pcb").style.x = -parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
   }
 
+<<<<<<< HEAD
 function schematicChangeOnClick(){
     console.log("schematic page change worked");
 
 }
 function layerChangeOnClick(){
     console.log("layer change worked");
+=======
+function schematicChangeOnClick(sourceObject){
+    console.log(sourceObject);
+    pages = $("#pages_list input:radio[name='pages']");
+    pages[pages.index(pages.filter(sourceObject))].checked = true;
+    change_page()
+    
+    
+
+}
+
+function layerChangeOnClick(sourceObject){  
+    console.log(sourceObject);
+    layers = $("#layers_list input:radio[name='layers']");
+    layers[layers.index(layers.filter(sourceObject))].checked = true;
+    change_layer();
+    
+>>>>>>> Layer_Change
 }
