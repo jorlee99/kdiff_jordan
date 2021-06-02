@@ -728,8 +728,12 @@ function sliderChange() {
     document.getElementById("diff-xlink-2-pcb").style.x = -parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
   }
 
-function schematicChangeOnClick(){
-    var layers = $("#layers_list input:radio[name='layers']");
+function schematicChangeOnClick(sourceObject){
+    console.log(sourceObject);
+    pages = $("#pages_list input:radio[name='pages']");
+    pages[pages.index(pages.filter(sourceObject))].checked = true;
+    change_page()
+    
     
 
 }
