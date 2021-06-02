@@ -726,6 +726,7 @@ function layerComparison(){
 function sliderChange() {
     document.getElementById("diff-xlink-1-pcb").style.opacity = parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
     document.getElementById("diff-xlink-2-pcb").style.x = -parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%";
+    console.log(parseFloat(document.getElementById("sliderRange").value).toFixed(2)+"%");
   }
 
 function schematicChangeOnClick(sourceObject){
